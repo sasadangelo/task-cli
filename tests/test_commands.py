@@ -3,49 +3,40 @@
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
 import os
+import csv
 import unittest
-from commands.add_task_command import AddTaskCommand
-from commands.list_task_command import ListTaskCommand
-from commands.delete_task_command import DeleteTaskCommand
+from commands import AddTaskCommand, ListTaskCommand, DeleteTaskCommand, StatsCommand
 
 
 class TestTaskCommands(unittest.TestCase):
-    TEST_FILE = "test_tasks.txt"
+    TASKS_FILE = "tasks.txt"
+    CSV_FILE = "tasks.csv"
 
     def setUp(self):
         """Prepare a clean test environment before each test."""
-        # Ensure we use a test-specific file
-        if os.path.exists(self.TEST_FILE):
-            os.remove(self.TEST_FILE)
-        open(self.TEST_FILE, "w").close()
+        for f in [self.TASKS_FILE, self.CSV_FILE]:
+            if os.path.exists(f):
+                os.remove(f)
+        open(self.TASKS_FILE, "w").close()
 
-        # Patch the file used by commands
+        # Initialize commands
         self.add_command = AddTaskCommand()
         self.list_command = ListTaskCommand()
         self.delete_command = DeleteTaskCommand()
-
-        # Monkey patch: redirect file operations to TEST_FILE
-        self._patch_files()
+        self.stats_command = StatsCommand()
 
     def tearDown(self):
         """Clean up after tests."""
-        if os.path.exists(self.TEST_FILE):
-            os.remove(self.TEST_FILE)
-
-    def _patch_files(self):
-        """Replace hardcoded 'tasks.txt' with 'test_tasks.txt'."""
-        for cmd in [self.add_command, self.list_command, self.delete_command]:
-            if hasattr(cmd, "FILE_PATH"):
-                cmd.FILE_PATH = self.TEST_FILE
-            else:
-                cmd.FILE_PATH = self.TEST_FILE  # Add dynamic property
+        for f in [self.TASKS_FILE, self.CSV_FILE]:
+            if os.path.exists(f):
+                os.remove(f)
 
     def test_add_task(self):
         """Should append a task to the file."""
         args = type("Args", (), {"name": "Buy milk"})
         self.add_command.execute(args)
 
-        with open(self.TEST_FILE) as f:
+        with open(self.TASKS_FILE) as f:
             tasks = [line.strip() for line in f.readlines()]
 
         self.assertIn("Buy milk", tasks)
@@ -53,12 +44,10 @@ class TestTaskCommands(unittest.TestCase):
 
     def test_list_tasks(self):
         """Should list tasks without error."""
-        # Add two tasks
-        with open(self.TEST_FILE, "w") as f:
+        with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\n")
 
         args = type("Args", (), {})()
-        # We just verify that the command runs without exception
         try:
             self.list_command.execute(args)
         except Exception as e:
@@ -66,17 +55,48 @@ class TestTaskCommands(unittest.TestCase):
 
     def test_delete_task(self):
         """Should delete the specified task."""
-        with open(self.TEST_FILE, "w") as f:
+        with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\nTask 3\n")
 
         args = type("Args", (), {"id": 2})
         self.delete_command.execute(args)
 
-        with open(self.TEST_FILE) as f:
+        with open(self.TASKS_FILE) as f:
             tasks = [line.strip() for line in f.readlines()]
 
         self.assertEqual(len(tasks), 2)
         self.assertNotIn("Task 2", tasks)
+
+    def test_stats_summary(self):
+        """Should display a summary of tasks."""
+        with open(self.TASKS_FILE, "w") as f:
+            f.write("Task 1\nTask 2\n")
+
+        args = type("Args", (), {"subcommand": "summary"})
+        try:
+            self.stats_command.execute(args)
+        except Exception as e:
+            self.fail(f"StatsCommand summary raised an exception: {e}")
+
+    def test_stats_export(self):
+        """Should export tasks to a CSV file."""
+        with open(self.TASKS_FILE, "w") as f:
+            f.write("Task 1\nTask 2\n")
+
+        args = type("Args", (), {"subcommand": "export", "output": self.CSV_FILE})
+        self.stats_command.execute(args)
+
+        self.assertTrue(os.path.exists(self.CSV_FILE))
+
+        with open(self.CSV_FILE, newline="") as csvfile:
+            reader = csv.reader(csvfile)
+            rows = list(reader)
+
+        # Validate CSV structure and content
+        self.assertEqual(rows[0], ["ID", "Task"])
+        self.assertEqual(rows[1][1], "Task 1")
+        self.assertEqual(rows[2][1], "Task 2")
+        self.assertEqual(len(rows), 3)
 
 
 if __name__ == "__main__":
