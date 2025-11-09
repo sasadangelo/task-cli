@@ -14,47 +14,50 @@ git clone https://github.com/your-org/task-cli.git
 cd task-cli
 ```
 
-2️⃣ Install Python 3.14
+### 2️⃣ Install Python 3.14
 
-Install Python 3.14 via uv
-:
+Install Python 3.14 via uv:
 
+```bash
 uv python install 3.14
 uv python pin 3.14
-
+```
 
 Check that it's active:
 
+```bash
 uv run python --version
-# Python 3.14.x
+```
 
-3️⃣ Sync dependencies
+### 3️⃣ Sync dependencies
+
+```bash
 uv sync
-
+```
 
 This command automatically:
 
-creates and activates a virtual environment (.venv/)
+* creates and activates a virtual environment (.venv/)
+* installs dependencies from pyproject.toml
+* uses the pinned Python 3.14 version
 
-installs dependencies from pyproject.toml
-
-uses the pinned Python 3.14 version
-
-🚀 Usage
+## 🚀 Usage
 
 Run all CLI commands using uv run (no need to manually activate the virtualenv).
 
-➕ Add a new task
+```bash
 uv run python -m src.cli add --name "Buy milk"
-
+```
 
 Output:
 
 ✅ Task added: Buy milk
 
 📋 List tasks
-uv run python -m src.cli list
 
+```bash
+uv run python -m src.cli list
+```
 
 Output:
 
@@ -62,14 +65,16 @@ Output:
 1. Buy milk
 
 🗑️ Delete a task
-uv run python -m src.cli delete --id 1
 
+```bash
+uv run python -m src.cli delete --id 1
+```
 
 Output:
 
 🗑️  Task deleted: Buy milk
 
-🧾 Where data is stored
+### 🧾 Where data is stored
 
 Tasks are stored in a plain text file tasks.txt located at the project root:
 
@@ -78,34 +83,25 @@ task-cli/
 │   └── cli.py
 └── tasks.txt   👈 list of all tasks
 
-🧪 Running tests
+## 🧪 Running tests
 
 All tests are under the tests/ folder and use Python’s built-in unittest framework.
 
 Run them with:
 
+```bash
 uv run python -m unittest discover -s tests -v
-
+```
 
 or just:
 
+```bash
 uv run python -m unittest tests.test_commands -v
+```
 
-⚙️ (Optional) Define uv scripts
+## 📁 Project structure
 
-To simplify commands, you can define aliases in pyproject.toml:
-
-[tool.uv.scripts]
-cli = "python -m src.cli"
-test = "python -m unittest discover -s tests -v"
-
-
-Now you can run:
-
-uv run cli list
-uv run test
-
-📁 Project structure
+```
 task-cli/
 │
 ├── src/
@@ -122,30 +118,16 @@ task-cli/
 │
 ├── pyproject.toml
 └── tasks.txt
+```
 
-💡 Notes
+## 💡 Notes
 
 The environment variable PYTHONPATH=src/ ensures that imports like
 from src.commands import AddTaskCommand work correctly.
 
 The CLI is structured to be easily extensible: just add new commands in src/commands/.
 
-🧑‍💻 Example development workflow
-# Start a fresh environment
-uv python install 3.14
-uv python pin 3.14
-uv sync
-
-# Add a task
-uv run python -m src.cli add --name "Read a book"
-
-# List tasks
-uv run python -m src.cli list
-
-# Run tests
-uv run python -m unittest -v
-
-🏁 License
+## 🏁 License
 
 MIT © Your Name
 
