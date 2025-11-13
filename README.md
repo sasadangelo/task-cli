@@ -78,10 +78,12 @@ Output:
 
 Tasks are stored in a plain text file tasks.txt located at the project root:
 
+```
 task-cli/
 ├── src/
 │   └── cli.py
 └── tasks.txt   👈 list of all tasks
+```
 
 ## 🧪 Running tests
 
