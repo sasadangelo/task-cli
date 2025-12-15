@@ -1,7 +1,7 @@
 # 🧰 Task CLI
 
 A simple Python command-line tool to manage personal tasks — built with modern tooling (`uv`) and a clean `src/` structure.
-It demonstrates how to organize a CLI project, structure commands, and run tests using `unittest`.
+It demonstrates how to organize a CLI project, structure commands, and run tests using `unittest`. To setup the Python development environment this project uses the [Python Blueprint](https://github.com/sasadangelo/python-blueprint).
 
 ---
 
