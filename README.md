@@ -131,5 +131,5 @@ The CLI is structured to be easily extensible: just add new commands in src/comm
 
 ## 🏁 License
 
-MIT © Your Name
+MIT © Salvatore D'Angelo
 
