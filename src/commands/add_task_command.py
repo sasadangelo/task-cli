@@ -6,7 +6,7 @@ from .base import Command
 
 
 class AddTaskCommand(Command):
-    def execute(self, args):
+    def execute(self, name: str):
         with open("tasks.txt", "a") as f:
-            f.write(args.name + "\n")
-        print(f"✅ Task added: {args.name}")
+            f.write(name + "\n")
+        print(f"✅ Task added: {name}")
