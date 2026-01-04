@@ -41,13 +41,13 @@ def stats():
 
 @stats.command(help="Show a summary of tasks")
 def summary():
-    StatsCommand().execute(subcommand="summary")
+    StatsCommand().summary()
 
 
 @stats.command(help="Export tasks to CSV file")
 @click.option("--output", "-o", default="tasks.csv", help="Output CSV file name")
 def export(output):
-    StatsCommand().execute(subcommand="export", output=output)
+    StatsCommand().export(output=output)
 
 
 if __name__ == "__main__":

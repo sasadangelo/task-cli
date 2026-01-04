@@ -21,6 +21,6 @@ class DeleteTaskCommand(Command):
         removed = tasks.pop(task_id - 1)
 
         with open("tasks.txt", "w") as f:
-            f.write("\n".join(tasks) + "\n")
+            f.write("\n".join(tasks))
 
         print(f"🗑️  Task deleted: {removed}")
