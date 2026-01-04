@@ -2,10 +2,14 @@
 # Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
 # Licensed under the MIT License. See LICENSE.md for details.
 # -----------------------------------------------------------------------------
-import os
+# python3 -m pytest -v test/test_suite.py
+# -----------------------------------------------------------------------------
+
 import csv
+import os
 import unittest
-from commands import AddTaskCommand, ListTaskCommand, DeleteTaskCommand, StatsCommand
+
+from commands import AddTaskCommand, DeleteTaskCommand, ListTaskCommand, StatsCommand
 
 
 class TestTaskCommands(unittest.TestCase):
@@ -33,8 +37,7 @@ class TestTaskCommands(unittest.TestCase):
 
     def test_add_task(self):
         """Should append a task to the file."""
-        args = type("Args", (), {"name": "Buy milk"})
-        self.add_command.execute(args)
+        self.add_command.execute(name="Buy milk")
 
         with open(self.TASKS_FILE) as f:
             tasks = [line.strip() for line in f.readlines()]
@@ -47,9 +50,8 @@ class TestTaskCommands(unittest.TestCase):
         with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\n")
 
-        args = type("Args", (), {})()
         try:
-            self.list_command.execute(args)
+            self.list_command.execute()
         except Exception as e:
             self.fail(f"ListTaskCommand raised an exception: {e}")
 
@@ -58,8 +60,7 @@ class TestTaskCommands(unittest.TestCase):
         with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\nTask 3\n")
 
-        args = type("Args", (), {"id": 2})
-        self.delete_command.execute(args)
+        self.delete_command.execute(task_id=2)
 
         with open(self.TASKS_FILE) as f:
             tasks = [line.strip() for line in f.readlines()]
@@ -72,19 +73,17 @@ class TestTaskCommands(unittest.TestCase):
         with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\n")
 
-        args = type("Args", (), {"subcommand": "summary"})
         try:
-            self.stats_command.execute(args)
+            self.stats_command.summary()
         except Exception as e:
-            self.fail(f"StatsCommand summary raised an exception: {e}")
+            self.fail(f"StatsCommand.summary() raised an exception: {e}")
 
     def test_stats_export(self):
         """Should export tasks to a CSV file."""
         with open(self.TASKS_FILE, "w") as f:
             f.write("Task 1\nTask 2\n")
 
-        args = type("Args", (), {"subcommand": "export", "output": self.CSV_FILE})
-        self.stats_command.execute(args)
+        self.stats_command.export(self.CSV_FILE)
 
         self.assertTrue(os.path.exists(self.CSV_FILE))
 
@@ -97,7 +96,3 @@ class TestTaskCommands(unittest.TestCase):
         self.assertEqual(rows[1][1], "Task 1")
         self.assertEqual(rows[2][1], "Task 2")
         self.assertEqual(len(rows), 3)
-
-
-if __name__ == "__main__":
-    unittest.main()
